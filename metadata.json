@@ -1,0 +1,10 @@
+{
+  "name": "InstantFix",
+  "description": "Premium doorstep phone and device repair in 60 minutes. Certified experts, genuine parts, and up to 1-year warranty.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

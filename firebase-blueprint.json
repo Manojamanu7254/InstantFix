@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "Booking": {
+      "title": "Booking",
+      "description": "A repair request from a customer",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Customer name" },
+        "phone": { "type": "string", "description": "Customer phone number" },
+        "deviceType": { "type": "string", "description": "Type of device (e.g., Mobile, Laptop)" },
+        "brand": { "type": "string", "description": "Device brand" },
+        "model": { "type": "string", "description": "Device model" },
+        "imei": { "type": "string", "description": "Device IMEI or Serial Number" },
+        "issue": { "type": "string", "description": "Description of the problem" },
+        "address": { "type": "string", "description": "Customer address for doorstep service" },
+        "status": { "type": "string", "enum": ["pending", "completed", "cancelled"], "description": "Current status of the repair" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the booking was created" }
+      },
+      "required": ["name", "phone", "deviceType", "brand", "model", "issue", "address", "status", "createdAt"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "A type of repair service offered",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Service title" },
+        "description": { "type": "string", "description": "Service description" },
+        "price": { "type": "string", "description": "Starting price or fixed price" },
+        "icon": { "type": "string", "description": "Lucide icon name" }
+      },
+      "required": ["title", "description", "price", "icon"]
+    }
+  },
+  "firestore": {
+    "bookings": {
+      "schema": "Booking",
+      "description": "Collection of repair bookings"
+    },
+    "services": {
+      "schema": "Service",
+      "description": "Collection of services offered"
+    }
+  }
+}

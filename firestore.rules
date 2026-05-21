@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: services
+    // Fields:
+    //   - title: string
+    //   - description: string
+    //   - price: string
+    //   - icon: string
+    //
+    // Collection: bookings
+    // Fields:
+    //   - name: string
+    //   - phone: string
+    //   - deviceType: string
+    //   - issue: string
+    //   - address: string
+    //   - status: string (pending, completed, cancelled)
+    //   - createdAt: string (ISO 8601)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "manujaanu16@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidBooking(data) {
+      return data.keys().hasAll(['name', 'phone', 'deviceType', 'brand', 'model', 'issue', 'address', 'status', 'createdAt']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.phone is string && data.phone.size() >= 10 && data.phone.size() <= 15 &&
+             data.deviceType is string &&
+             data.brand is string &&
+             data.model is string &&
+             data.issue is string && data.issue.size() < 1000 &&
+             data.address is string && data.address.size() < 500 &&
+             data.status in ['pending', 'completed', 'cancelled'] &&
+             data.createdAt is string;
+    }
+
+    function isValidService(data) {
+      return data.keys().hasAll(['title', 'description', 'price', 'icon']) &&
+             data.title is string && data.description is string &&
+             data.price is string && data.icon is string;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if true; // Public can see services
+      allow write: if isAdmin();
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if isAdmin();
+      allow create: if isValidBooking(request.resource.data);
+      allow update: if isAdmin() && isValidBooking(request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}
